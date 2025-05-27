@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jed</title>
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      /* height: 100vh; */
+      /* height: 100%; */
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .console {
+      color: #00ff00;
+      padding: 20px;
+      max-width: 80%;
+      font-size: 1.2rem;
+      white-space: pre-wrap;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.2em;
+      background-color: #00ff00;
+      animation: blink 1s step-start 0s infinite;
+      vertical-align: bottom;
+    }
+
+    button {
+      display: block;
+      margin: 10px 0;
+      background-color: transparent;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      padding: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003300;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body onload="processSubmissions()">
+  <div class="console" id="console"><span id="typedText"></span><span class="cursor" id="cursor"></span><div id="spinner"></div></div>
+
+  <script>
+    const welcome_text = `Welcome user Munimitso!\n`;
+    const palanca_text = `WLOG, ang galing mo mag code ng stuff HAHAHA.
+(tama ba paggamit ko nun)
+
+Congratulations sa pag-gradute fellow NOIghber!
+Ambilis naman nung 6 years, sana nakilala kita earlier para mas mabilis and pag-rise natin as the coding masters ng batch WAHAHA.
+
+This may be the end of our highschool journey, pero this is not goodbye.
+Magkikita pa tayo ulit sa computer labs ng UP Mindanao, and maybe even sa boarding house.
+It was an honor coding with you, and I am looking forward to that again sometime.
+See you soon Jed.
+
+Pahiram din ako ng penchick from time to time :)
+
+- ian_0x00`;
+
+    const typedTextElement = document.getElementById("typedText");
+    const cursorElement = document.getElementById("cursor");
+    const spinnerElement = document.getElementById("spinner");
+
+    const spinner_frames = ['/', '-', '\\', '|'];
+    let spinner_frame_idx = 0;
+
+    const handle = "Munimitso";
+    // const handle = "gingerking";
+    const contestId = 1538;
+    const index = 'B';
+    const name = "Friends and Candies";
+
+    let problem_solved = false
+
+    function backgroundTransition(callback) {
+      document.body.style.backgroundColor = "#003000";
+      setTimeout(() => {document.body.style.backgroundColor = "black";}, 100);
+      setTimeout(() => {document.body.style.backgroundColor = "#003000";}, 200);
+      setTimeout(() => {document.body.style.backgroundColor = "black";}, 300);
+      setTimeout(callback, 400);
+    }
+
+    function decisionFunction() {
+      stopSpinner();
+      cursorElement.style.visibility = "visible";
+      if (problem_solved) {
+        typeText("\nIt seems that you have already solved the problem I wanted you to solve >:)\nYou may now read my very awesome palanca.", 0, false, true);
+      } else {
+        typeText("\nIn order to read my very awesome palanca you must first solve Friends and Candies from Codeforces Round 725 (Div. 3) using your handle >:)", 0, false, false);
+      }
+    }
+
+    function processSubmissions() {
+      fetch(`https://codeforces.com/api/user.status?handle=${handle}&from=1&count=1000`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // console.log(data["result"]);
+          for(let i = 0; i < data["result"].length; i++){
+            let problem = data["result"][i]["problem"];
+            let verdict = data["result"][i]["verdict"];
+            if (problem["contestId"] == contestId && problem["index"] == index && problem["name"] == name && verdict == "OK") {
+              problem_solved = true;
+            }
+          }
+          setTimeout(decisionFunction, 5000);
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+          setTimeout(decisionFunction, 5000);
+        });
+    }
+
+    function startSpinner() {
+      spinnerElement.style.visibility = "visible";
+    }
+
+    function stopSpinner() {
+      spinnerElement.style.visibility = "hidden";
+    }
+
+    function typeText(text, i, showSpinner, showPalanca) {
+      if (i < text.length) {
+        typedTextElement.textContent += text.charAt(i);
+        let delay_ms = (text.charAt(i) == '\n' ? 500 : 50);
+        i++;
+        setTimeout(typeText, delay_ms, text, i, showSpinner, showPalanca);
+        
+        if (i == text.length) {
+          // document.getElementsByClassName("cursor")[0].style.visibility = "hidden";
+          cursorElement.style.visibility = "hidden";
+          if (showSpinner)
+            setTimeout(startSpinner, 500);
+          if (showPalanca)
+            setTimeout(() => {
+              typedTextElement.innerHTML = '';
+              backgroundTransition(() => {
+                cursorElement.style.visibility = "visible";
+                setTimeout(typeText, 1500, palanca_text, false, false);
+              });
+            }, 1500);
+        }
+      }
+    }
+
+    stopSpinner();
+    setTimeout(typeText, 1500, welcome_text, 0, true, false);
+    setInterval(() => {
+        spinnerElement.textContent = spinner_frames[spinner_frame_idx % spinner_frames.length];
+        spinner_frame_idx += 1
+        spinner_frame_idx %= spinner_frames.length;
+      }, 100);
+  </script>
+</body>
+</html>

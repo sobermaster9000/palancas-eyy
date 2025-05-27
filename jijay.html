@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jijay</title>
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      /* height: 100vh; */
+      /* height: 100%; */
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .console {
+      color: #00ff00;
+      padding: 20px;
+      max-width: 80%;
+      font-size: 1.2rem;
+      white-space: pre-wrap;
+    }
+
+    #shownCode {
+      color: #ffffff;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.2em;
+      background-color: #00ff00;
+      animation: blink 1s step-start 0s infinite;
+      vertical-align: bottom;
+    }
+
+    button {
+      display: block;
+      margin: 10px 0;
+      background-color: transparent;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      padding: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003300;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="console" id="console"><span id="typedText"></span><span class="cursor"></span><span id="shownCode"></span></div>
+
+  <script>
+    const welcome_text = `Welcome user mkns!\nPlease choose an option:`;
+    const palanca_text = `Alam mo gud, medyo nagulat ako nung grade 7 nung nag roomhop ako sa inyo tas bigla mo akong pinansin.
+
+Anyways, congratulations on your graduation fellow NOIghber!
+Grabe ambilis talaga ng 6 years.
+And sayang, di pala tayo kumpleto ni Jed sa UP Mindanao.
+Good luck sa Diliman JJ, and keep academically soaring.
+It was an honor coding with you, and it would be nice if we could do something like that again.
+Wag ka na mag dumpster bed dumpster bed dun sa Diliman HAHAHA.
+
+- gingerking
+
+mkns
+`;
+    const segtree_text = `In order to help you in your programming journey, here is an implementation of a basic segment tree in Python:`;
+    const segtree_code_lines = `
+
+class Node:
+def __init__(self, sum, left_idx, right_idx):
+    self.sum = sum
+    self.left_idx = left_idx
+    self.right_idx = right_idx
+    self.left = self.right = None
+
+def build(arr, left_idx, right_idx):
+    if left_idx == right_idx: return Node(arr[left_idx], left_idx, right_idx)
+    mid_idx = (left_idx + right_idx) // 2
+    root = Node(0, left_idx, right_idx)
+    root.left = build(arr, left_idx, mid_idx)
+    root.right = build(arr, mid_idx + 1, right_idx)
+    root.sum = root.left.sum + root.right.sum
+    return root
+
+def update(idx, val, curr):
+    if curr.left_idx == curr.right_idx:
+        curr.sum = val
+        return
+    mid_idx = (curr.left_idx + curr.right_idx) // 2
+    if idx > mid_idx:
+        update(idx, val, curr.right)
+    else:
+        update(idx, val, curr.left)
+    curr.sum = curr.left.sum + curr.right.sum
+
+def query(left_idx, right_idx, curr):
+    if curr.left_idx == left_idx and curr.right_idx == right_idx:
+        return curr.sum
+    mid_idx = (curr.left_idx + curr.right_idx) // 2
+    if left_idx > mid_idx:
+        return query(left_idx, right_idx, curr.right)
+    elif right_idx <= mid_idx:
+        return query(left_idx, right_idx, curr.left)
+    return query(left_idx, mid_idx, curr.left) + query(mid_idx + 1, right_idx, curr.right)
+
+arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+segTree = build(arr, 0, len(arr) - 1)
+print(query(0, 10, segTree))
+update(4, 69, segTree)
+print(query(0, 10, segTree))
+`.split('\n');
+
+    const typedTextElement = document.getElementById("typedText");
+    const typedCodeElement = document.getElementById("shownCode");
+
+    function backgroundTransition(callback) {
+        document.body.style.backgroundColor = "#003000";
+        setTimeout(() => {document.body.style.backgroundColor = "black";}, 100);
+        setTimeout(() => {document.body.style.backgroundColor = "#003000";}, 200);
+        setTimeout(() => {document.body.style.backgroundColor = "black";}, 300);
+        setTimeout(callback, 400);
+    }
+
+    function clearTextAndButtons() {
+      typedTextElement.innerHTML = '';
+      let buttons = document.getElementsByClassName("button");
+      while (buttons.length)
+        buttons[0].remove();
+    }
+
+    function option1Pressed() {
+      console.log("option 1 pressed");
+
+      clearTextAndButtons();
+
+      backgroundTransition(() => {
+        document.getElementsByClassName("cursor")[0].style.visibility = "visible";
+        setTimeout(typeText, 1500, palanca_text, 0, false, true, false);
+      });      
+    }
+
+    function option2Pressed() {
+      console.log("option 2 pressed");
+
+      clearTextAndButtons();
+
+      backgroundTransition(() => {
+        document.getElementsByClassName("cursor")[0].style.visibility = "visible";
+        setTimeout(typeText, 1500, segtree_text, 0, false, false, true);
+      });
+    }
+
+    function backOptionPressed() {
+      console.log("back option pressed");
+
+      clearTextAndButtons();
+      typedCodeElement.innerHTML = '';
+
+      backgroundTransition(() => {
+        document.getElementsByClassName("cursor")[0].style.visibility = "visible";
+        setTimeout(typeText, 1500, welcome_text, 0, true, false, false);
+      });
+    }
+
+    function addOptions() {
+      let option1_btn = document.createElement("button");
+      let option2_btn = document.createElement("button");
+
+      option1_btn.appendChild(document.createTextNode("Palanca"));
+      option2_btn.appendChild(document.createTextNode("Segment \"Sigma\" Tree"));
+      option1_btn.classList.add("button");
+      option2_btn.classList.add("button");      
+      option1_btn.addEventListener("click", option1Pressed);
+      option2_btn.addEventListener("click", option2Pressed);
+      
+      setTimeout(() => {typedTextElement.parentElement.appendChild(option1_btn);}, 500);
+      setTimeout(() => {typedTextElement.parentElement.appendChild(option2_btn);}, 1000);
+    }
+
+    function addBackOption() {
+      let back_option_btn = document.createElement("button");
+
+      back_option_btn.appendChild(document.createTextNode("Back"));
+      back_option_btn.classList.add("button");
+      back_option_btn.addEventListener("click", backOptionPressed);
+
+      setTimeout(() => {typedTextElement.parentElement.appendChild(back_option_btn);}, 500);
+    }
+
+    function showCode(code_lines, i) {
+      if (i < code_lines.length) {
+        typedCodeElement.textContent += code_lines[i] + '\n';
+        setTimeout(showCode, 100, code_lines, i+1);
+      } else
+        addBackOption();
+    }
+
+    function typeText(text, i, showOptions, showBackOption, hasCode) {
+      if (i < text.length) {
+        typedTextElement.textContent += text.charAt(i);
+        let delay_ms = (text.charAt(i) == '\n' ? 500 : 50);
+        i++;
+        setTimeout(typeText, delay_ms, text, i, showOptions, showBackOption, hasCode);
+        
+        if (i == text.length) {
+          document.getElementsByClassName("cursor")[0].style.visibility = "hidden";
+          if (showOptions)
+            addOptions();
+          if (showBackOption)
+            addBackOption();
+          if (hasCode)
+            showCode(segtree_code_lines, 0);
+        }
+      }
+    }
+
+    setTimeout(typeText, 1500, welcome_text, 0, true, false, false);
+  </script>
+</body>
+</html>
